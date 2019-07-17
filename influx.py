@@ -5,25 +5,35 @@ from time import sleep
 from datetime import datetime
 from pprint import pprint
 from time import time
+import traceback, pprint, os
+from distutils.util import strtobool
 
 # EDIT
-profile = 'byip'
-site_name = 'default'
+profile = 'default'
 
-default_tags = None
+influx_host         = os.getenv('INFLUX_HOST', 'localhost')
+influx_port         = os.getenv('INFLUX_PORT', '8086')
+controller_uri      = os.getenv('CONTROLLER_URI', 'https://unifi:8443')
+controller_username = os.getenv('CONTROLLER_USERNAME', 'admin')
+controller_password = os.getenv('CONTROLLER_PASSWORD', 'password')
+controller_verify   = bool(strtobool(os.getenv('CONTROLLER_VERIFY', 'false')))
+controller_site     = os.getenv('CONTROLLER_SITE', 'default')
+default_tags        = os.getenv('INFLUX_DEFAULTTAGS')
 
-client = InfluxDBClient('localhost', 8086)
-
-# END EDIT
-
-c = controller(profile=profile)
-s = c.sites[site_name]()
+client = InfluxDBClient(influx_host, influx_port)
+c = controller(
+    endpoint=controller_uri, 
+    username=controller_username, 
+    password=controller_password, 
+    verify=controller_verify)
+s = c.sites[controller_site]()
+pp = pprint.PrettyPrinter(indent=4)
 
 try:
     default_tags = {
         'hostname': s.sysinfo()[0]['hostname'],
-        'site': site_name,
-        'desc': c.sites[site_name]['desc']
+        'site': controller_site,
+        'desc': c.sites[controller_site]['desc']
     }
 except:
     print("Could not generate site default tags")
@@ -92,6 +102,9 @@ while True:
         devs = s.devices()
 
         for dev in devs:
+            if not all (k in dev for k in ("name","mac","type")):
+                continue
+
             temp_json = {
                 'measurement': 'uplink',
                 'tags': {
@@ -189,7 +202,10 @@ while True:
         print("exception in controller, wait 30 and try logging in again")
         sleep(30)
         c = controller(profile=profile)
-        s = c.sites[site_name]()
+        s = c.sites[controller_site]()
+    except Exception:
+        traceback.print_exc()
+        pass
     except:
         print("exception in gather")
         pass
