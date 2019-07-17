@@ -13,6 +13,7 @@ profile = 'default'
 
 influx_host         = os.getenv('INFLUX_HOST', 'localhost')
 influx_port         = os.getenv('INFLUX_PORT', '8086')
+influx_database     = os.getenv('INFLUX_DATABASE', 'unifi')
 controller_uri      = os.getenv('CONTROLLER_URI', 'https://unifi:8443')
 controller_username = os.getenv('CONTROLLER_USERNAME', 'admin')
 controller_password = os.getenv('CONTROLLER_PASSWORD', 'password')
@@ -38,8 +39,8 @@ try:
 except:
     print("Could not generate site default tags")
 
-client.create_database('unifi')
-client.switch_database('unifi')
+client.create_database(influx_database)
+client.switch_database(influx_database)
 
 current_data = {}
 last_app_dpi = 0

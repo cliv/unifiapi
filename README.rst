@@ -104,9 +104,10 @@ Running:
   docker run -d \
     -e INFLUX_HOST=influxdb \
     -e INFLUX_PORT=8086 \
+    -e INFLUX_DATABASE=unifi \
     -e CONTROLLER_URI=https://unifi:8443 \
     -e CONTROLLER_USERNAME=admin \
     -e CONTROLLER_PASSWORD=password \
     -e CONTROLLER_VERIFY=false \
     -e CONTROLLER_SITE=default \
-    cliv/influxdb
+    cliv/unifi-influxdb
