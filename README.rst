@@ -89,3 +89,23 @@ Show the temperatures of all units with sensors
   ...     print('{ip} - {general_temperature}C'.format(**item))
   ...
   10.11.10.6 - 58C
+
+---------------------------
+Docker / InfluxDB Reporter
+---------------------------
+
+Docker support has been added for influx.py to allow data collection into
+InfluxDB.
+
+Running:
+.. code-block::
+
+  docker run -d \
+    -e INFLUX_HOST=influxdb \
+    -e INFLUX_PORT=8086 \
+    -e CONTROLLER_URI=https://unifi:8443 \
+    -e CONTROLLER_USERNAME=admin \
+    -e CONTROLLER_PASSWORD=password \
+    -e CONTROLLER_VERIFY=false \
+    -e CONTROLLER_SITE=default \
+    cliv/influxdb
